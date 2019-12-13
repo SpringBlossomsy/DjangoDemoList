@@ -4,6 +4,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt, get_token
 from django_demo_list.utils import get_int_value
 from phone_book_android.models import Phone
+import time
 
 
 @require_http_methods(['GET', 'POST'])
@@ -30,7 +31,14 @@ def get_phone_list(request):
         'phone_list': [],
         'total': 0,
     }
-    records = Phone.objects.all()
+    time.sleep(2)
+    try:
+        page = int(request.GET.get('page', 1))
+    except Exception as e:
+        print(e)
+        page = 1
+    size = 10
+    records = Phone.objects.all()[size*(page-1):size*page]
     results['phone_list'] = get_phone_detail(records)
     results['total'] = len(records)
     return JsonResponse(results)
